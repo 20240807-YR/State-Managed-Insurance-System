@@ -1,10 +1,4 @@
-FROM python:3.10-slim
+FROM ghcr.io/mlflow/mlflow:v2.9.2
 
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY scripts/ ./scripts/
-
-CMD ["python", "scripts/run.py"]
+# PostgreSQL backend 사용을 위한 드라이버
+RUN pip install --no-cache-dir psycopg2-binary
