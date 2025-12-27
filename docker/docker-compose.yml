@@ -7,6 +7,8 @@ services:
       POSTGRES_PASSWORD: mlflow
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.9.2
@@ -21,7 +23,6 @@ services:
       --host 0.0.0.0
       --port 5000
       --backend-store-uri postgresql://mlflow:mlflow@postgres:5432/mlflow
-      --default-artifact-root mlflow-artifacts:/
-      --artifacts-destination /mlruns
+      --default-artifact-root /mlruns
       --serve-artifacts
       --gunicorn-opts "--workers 1"

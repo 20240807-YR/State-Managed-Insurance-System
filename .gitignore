@@ -110,3 +110,26 @@ pgdata/
 .DS_Store
 
 
+# ===== Python / venv =====
+.venv/
+.venv-mlflow/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# ===== MLflow artifacts & local runs =====
+mlruns/
+docker/mlruns/
+docker/mlflow_backend/
+docker/mlflow.db
+docker/*.db
+
+# ===== Docker volumes (LOCAL ONLY) =====
+docker/pgdata/
+pgdata/
+
+# ===== OS =====
+.DS_Store
+
+# ===== Jupyter temp =====
+*.log
