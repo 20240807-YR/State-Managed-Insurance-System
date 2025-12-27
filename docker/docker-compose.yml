@@ -5,4 +5,12 @@ services:
     image: ghcr.io/mlflow/mlflow:v2.9.2
     ports:
       - "5001:5000"
-    command: mlflow ui --host 0.0.0.0
+    volumes:
+      - ./mlruns:/mlruns
+      - ./mlflow_backend:/mlflow_backend
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:////mlflow_backend/mlflow.db
+      --default-artifact-root /mlruns
