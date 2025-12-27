@@ -133,3 +133,21 @@ pgdata/
 
 # ===== Jupyter temp =====
 *.log
+
+# ---- MLflow artifacts / local stores ----
+mlruns/
+**/mlruns/
+mlflow.db
+**/mlflow.db
+
+# ---- Postgres volume (docker compose) ----
+pgdata/
+**/pgdata/
+
+# ---- Python env / caches ----
+.venv/
+venv/
+.conda/
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
