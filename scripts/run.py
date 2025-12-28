@@ -1,12 +1,16 @@
 import subprocess
 import sys
+from pathlib import Path
 
-def run(cmd):
-    print("▶", " ".join(cmd))
-    subprocess.run(cmd, check=True)
+BASE_DIR = Path(__file__).resolve().parents[1]
 
-run([sys.executable, "scripts/run_core5.py"])
-run([sys.executable, "scripts/run_core9.py"])
-run([sys.executable, "scripts/run_compare.py"])
+def run(script):
+    script_path = BASE_DIR / "scripts" / script
+    print("▶", sys.executable, script_path)
+    subprocess.run([sys.executable, str(script_path)], check=True)
+
+run("run_core5.py")
+run("run_core9.py")
+run("run_compare.py")
 
 print("✅ Pipeline finished")
