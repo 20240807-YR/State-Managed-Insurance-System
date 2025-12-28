@@ -1,9 +1,12 @@
-import os
 import subprocess
+import sys
 
-core = os.getenv("CORE", "5").strip()
+def run(cmd):
+    print("▶", " ".join(cmd))
+    subprocess.run(cmd, check=True)
 
-if core == "9":
-    subprocess.check_call(["python", "scripts/run_core9.py"])
-else:
-    subprocess.check_call(["python", "scripts/run_core5.py"])
+run([sys.executable, "scripts/run_core5.py"])
+run([sys.executable, "scripts/run_core9.py"])
+run([sys.executable, "scripts/run_compare.py"])
+
+print("✅ Pipeline finished")
