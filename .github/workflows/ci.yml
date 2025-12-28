@@ -1,14 +1,39 @@
-name: CI
+name: pipeline-verify
 
-on: [push]
+on:
+  push:
+    branches: ["main"]
 
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
-        run: docker build -t state-insurance -f docker/Dockerfile .
+      - name: Build image
+        run: |
+          docker build -t state-insurance -f docker/Dockerfile .
+
+      - name: Run pipeline (run.py)
+        run: |
+          docker run --rm \
+            -e INPUT_DIR=/app/data/derived \
+            -e DERIVED_DIR=/app/data/derived \
+            -e MLFLOW_TRACKING_URI=http://host.docker.internal:5001 \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            state-insurance \
+            python scripts/run.py
+
+      - name: Verify output artifacts
+        run: |
+          echo "Checking derived outputs..."
+          test -f data/derived/core5_decision_log.csv
+          test -f data/derived/core9_state_based_decision_log.csv
+          test -f data/derived/core9_final_summary.csv
+          echo "✅ All required artifacts exist"
