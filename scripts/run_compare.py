@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import mlflow
 
 BASE_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..")
@@ -10,6 +11,11 @@ DERIVED_DIR = os.getenv(
     os.path.join(BASE_DIR, "data", "derived")
 )
 
+MLFLOW_TRACKING_URI = os.getenv(
+    "MLFLOW_TRACKING_URI",
+    "http://localhost:5001"
+)
+
 CORE5_PATH = os.path.join(DERIVED_DIR, "core5_decision_log.csv")
 CORE9_PATH = os.path.join(DERIVED_DIR, "core9_state_based_decision_log.csv")
 OUT_PATH   = os.path.join(DERIVED_DIR, "core9_final_summary.csv")
@@ -17,6 +23,7 @@ OUT_PATH   = os.path.join(DERIVED_DIR, "core9_final_summary.csv")
 print("BASE_DIR:", BASE_DIR)
 print("CORE5_PATH:", CORE5_PATH)
 print("CORE9_PATH:", CORE9_PATH)
+print("MLFLOW_TRACKING_URI:", MLFLOW_TRACKING_URI)
 
 core5_df = pd.read_csv(CORE5_PATH)
 core9_df = pd.read_csv(CORE9_PATH)
@@ -77,3 +84,33 @@ summary = pd.DataFrame({
 summary.to_csv(OUT_PATH, index=False)
 print("saved:", OUT_PATH)
 print(summary)
+
+try:
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+    mlflow.set_experiment("decision_layer_comparison")
+
+    with mlflow.start_run(run_name="Core5_decision"):
+        mlflow.log_param("core", 5)
+        mlflow.log_param("decision_type", "prediction_based")
+        mlflow.log_param("key_definition", "asset_id,date,t_index")
+
+        mlflow.log_metric("toggle_rate", toggle_core5)
+        mlflow.log_metric("false_intervention", len(false_core5))
+        mlflow.log_metric("stabilization_rate", stab_core5)
+
+
+    with mlflow.start_run(run_name="Core9_state_based_decision"):
+        mlflow.log_param("core", 9)
+        mlflow.log_param("decision_type", "state_based")
+        mlflow.log_param("state_model", "muHSM")
+        mlflow.log_param("key_definition", "asset_id,date,t_index")
+
+        mlflow.log_metric("toggle_rate", toggle_core9)
+        mlflow.log_metric("false_intervention", len(false_core9))
+        mlflow.log_metric("stabilization_rate", stab_core9)
+
+    print("✅ MLflow Phase 6 logging completed")
+
+except Exception as e:
+
+    print("⚠️ MLflow logging skipped:", e)
